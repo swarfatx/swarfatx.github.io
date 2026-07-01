@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinical Reasoning Case · The Ache That Wouldn't Quit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F7F4;
+    --ink:#1C2A2F;
+    --muted:#6E7B74;
+    --line:#E2E6DF;
+    --surface:#FFFFFF;
+    --teal:#2F6F6A;
+    --teal-soft:#E8F0EC;
+    --teal-deep:#234F4B;
+    --alert:#C2542E;
+    --alert-soft:#F7E9E1;
+    --good:#2F6F6A;
+    --shadow:0 1px 2px rgba(28,42,47,.04), 0 8px 30px rgba(28,42,47,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    padding:clamp(16px,4vw,48px);
+  }
+  .wrap{max-width:1080px;margin:0 auto}
+
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--teal);display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow .tick{width:22px;height:1px;background:var(--teal);display:inline-block}
+
+  h1{
+    font-family:"Fraunces",serif;
+    font-weight:500;
+    font-size:clamp(30px,5.4vw,52px);
+    line-height:1.04;letter-spacing:-.01em;
+    margin:14px 0 0;
+  }
+  .lede{color:var(--muted);font-size:clamp(15px,2.2vw,18px);max-width:60ch;margin-top:16px}
+
+  /* ---------- intro ---------- */
+  .intro-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:18px;
+    padding:clamp(22px,4vw,40px);box-shadow:var(--shadow);margin-top:30px;
+  }
+  .obj-label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .obj{list-style:none;display:grid;gap:12px}
+  .obj li{display:flex;gap:12px;align-items:flex-start;font-size:15px}
+  .obj li::before{content:"";flex:0 0 auto;width:8px;height:8px;border-radius:50%;
+    background:var(--teal);margin-top:8px}
+  .disclaimer{margin-top:24px;font-size:12.5px;color:var(--muted);
+    border-top:1px solid var(--line);padding-top:16px;line-height:1.5}
+
+  .btn{
+    font-family:"IBM Plex Sans",sans-serif;font-weight:600;font-size:15px;
+    border:none;border-radius:11px;padding:14px 24px;cursor:pointer;
+    background:var(--teal);color:#fff;transition:transform .15s ease,background .2s ease;
+    display:inline-flex;align-items:center;gap:10px;
+  }
+  .btn:hover{background:var(--teal-deep)}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:transparent;color:var(--teal);border:1px solid var(--line)}
+  .btn.ghost:hover{background:var(--teal-soft)}
+  .btn:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+  .start-row{margin-top:30px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .start-row .meta{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted)}
+
+  /* ---------- play layout ---------- */
+  .stage{display:grid;grid-template-columns:1fr 320px;gap:26px;margin-top:28px;align-items:start}
+  @media(max-width:820px){.stage{grid-template-columns:1fr}}
+
+  .scene{background:var(--surface);border:1px solid var(--line);border-radius:18px;
+    padding:clamp(20px,3.4vw,34px);box-shadow:var(--shadow);min-height:300px}
+  .step-tag{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted)}
+  .situation{font-size:16.5px;margin-top:14px;line-height:1.6}
+  .situation em{color:var(--teal-deep);font-style:italic}
+  .prompt{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(20px,3vw,26px);
+    line-height:1.2;margin-top:22px;letter-spacing:-.005em}
+
+  .choices{display:grid;gap:12px;margin-top:22px}
+  .choice{
+    text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:12px;
+    padding:16px 18px;font-size:15px;font-family:inherit;color:var(--ink);cursor:pointer;
+    transition:border-color .18s ease,background .18s ease,transform .12s ease;line-height:1.45;
+  }
+  .choice:hover{border-color:var(--teal);background:#fff}
+  .choice:active{transform:translateY(1px)}
+  .choice:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+
+  /* feedback block */
+  .resp{animation:rise .4s ease both}
+  .resp .patient{font-size:15.5px;line-height:1.6;color:var(--ink)}
+  .resp .patient::before{content:"AT THE BEDSIDE";display:block;
+    font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;
+    color:var(--muted);margin-bottom:8px}
+  .coach{margin-top:18px;border-radius:12px;padding:16px 18px;font-size:14.5px;line-height:1.55}
+  .coach .k{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;display:block;margin-bottom:7px}
+  .coach.good{background:var(--teal-soft)} .coach.good .k{color:var(--teal-deep)}
+  .coach.ok{background:#EEF1EC} .coach.ok .k{color:var(--muted)}
+  .coach.poor{background:var(--alert-soft)} .coach.poor .k{color:var(--alert)}
+  .continue-row{margin-top:22px}
+
+  /* ---------- chart panel ---------- */
+  .chart{position:sticky;top:24px;display:grid;gap:16px}
+  @media(max-width:820px){.chart{position:static}}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;
+    padding:18px 18px 20px;box-shadow:var(--shadow)}
+  .panel h3{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:10.5px;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+
+  .pt-id{display:flex;gap:14px;align-items:center}
+  .pt-avatar{flex:0 0 auto;width:46px;height:46px;border-radius:50%;background:var(--teal-soft);
+    color:var(--teal-deep);display:grid;place-items:center;font-family:"Fraunces",serif;
+    font-size:19px;font-weight:600}
+  .pt-name{font-family:"Fraunces",serif;font-size:19px;font-weight:500;line-height:1.1}
+  .pt-sub{font-size:13px;color:var(--muted);margin-top:2px}
+  .vitals{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+  .chip{font-family:"IBM Plex Mono",monospace;font-size:11px;background:var(--paper);
+    border:1px solid var(--line);border-radius:999px;padding:5px 10px;color:var(--ink)}
+
+  /* meter */
+  .meter-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+  .meter-val{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--teal-deep)}
+  .meter-track{height:8px;background:var(--paper);border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .meter-fill{height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--teal-deep));
+    border-radius:999px;transition:width .6s cubic-bezier(.2,.7,.2,1)}
+
+  .notebook{list-style:none;display:grid;gap:9px;min-height:8px}
+  .notebook li{font-size:13.5px;line-height:1.4;display:flex;gap:9px;align-items:flex-start;
+    animation:rise .45s ease both}
+  .notebook li::before{content:"";flex:0 0 auto;width:6px;height:6px;border-radius:2px;
+    background:var(--teal);margin-top:7px}
+  .empty-note{font-size:13px;color:var(--muted);font-style:italic}
+
+  .flags{display:grid;gap:9px;min-height:8px}
+  .flag{display:flex;gap:10px;align-items:flex-start;background:var(--alert-soft);
+    border:1px solid #EAC9B8;border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.4;
+    animation:stamp .5s cubic-bezier(.2,1.3,.3,1) both}
+  .flag .mark{flex:0 0 auto;color:var(--alert);font-weight:600}
+
+  /* ---------- debrief ---------- */
+  .debrief .verdict{background:var(--surface);border:1px solid var(--line);border-radius:18px;
+    padding:clamp(22px,4vw,38px);box-shadow:var(--shadow)}
+  .verdict .badge{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;padding:6px 12px;border-radius:999px;display:inline-block}
+  .badge.good{background:var(--teal-soft);color:var(--teal-deep)}
+  .badge.partial{background:#EEF1EC;color:var(--muted)}
+  .badge.miss{background:var(--alert-soft);color:var(--alert)}
+  .verdict h2{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(24px,4vw,34px);
+    line-height:1.12;margin:16px 0 0;letter-spacing:-.01em}
+  .verdict p{margin-top:14px;font-size:16px;line-height:1.6;max-width:64ch}
+  .verdict p.story{color:var(--ink)}
+
+  .score-strip{display:flex;gap:26px;flex-wrap:wrap;margin-top:26px;padding-top:22px;
+    border-top:1px solid var(--line)}
+  .score-item .n{font-family:"Fraunces",serif;font-size:30px;font-weight:500;line-height:1}
+  .score-item .l{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);margin-top:6px}
+
+  .recap{margin-top:24px;display:grid;gap:12px}
+  .recap-row{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:16px 18px}
+  .recap-row .q{font-size:13px;color:var(--muted);margin-bottom:6px}
+  .recap-row .you{font-size:15px;display:flex;gap:9px;align-items:flex-start}
+  .recap-row .dot{flex:0 0 auto;width:9px;height:9px;border-radius:50%;margin-top:7px}
+  .dot.good{background:var(--good)} .dot.ok{background:#B6BEB6} .dot.poor{background:var(--alert)}
+  .recap-row .lesson{font-size:13.5px;color:var(--teal-deep);margin-top:8px;
+    padding-left:18px;border-left:2px solid var(--teal-soft);line-height:1.5}
+
+  .expert{background:var(--teal-deep);color:#EAF1EE;border-radius:18px;
+    padding:clamp(22px,4vw,34px);margin-top:24px}
+  .expert h3{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:#9DC3BC;margin-bottom:14px}
+  .expert p{font-size:15.5px;line-height:1.65;max-width:64ch}
+  .expert p+p{margin-top:12px}
+
+  .maker{margin-top:24px;border:1px dashed var(--line);border-radius:16px;padding:22px 24px;
+    background:rgba(47,111,106,.04)}
+  .maker h3{font-family:"Fraunces",serif;font-weight:500;font-size:19px;margin-bottom:8px}
+  .maker p{font-size:14.5px;color:var(--ink);line-height:1.6;max-width:66ch}
+  .maker code{font-family:"IBM Plex Mono",monospace;font-size:13px;background:#fff;
+    border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--teal-deep)}
+
+  .footer{margin-top:34px;text-align:center;font-family:"IBM Plex Mono",monospace;
+    font-size:11.5px;letter-spacing:.1em;color:var(--muted)}
+
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes stamp{0%{opacity:0;transform:scale(1.15) rotate(-1.5deg)}
+    60%{opacity:1;transform:scale(.98)}100%{transform:scale(1)}}
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+  .hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===================== INTRO ===================== -->
+  <section id="intro">
+    <div class="eyebrow"><span class="tick"></span>Clinical Reasoning Case&nbsp;·&nbsp;01</div>
+    <h1>The Ache That Wouldn't Quit</h1>
+    <p class="lede">A patient walks in with six weeks of low back pain. Most cases like this are mechanical and harmless. A few are not. Your job isn't to diagnose — it's to reason well enough to tell which patient is in front of you.</p>
+
+    <div class="intro-card">
+      <div class="obj-label">In this case you'll practice</div>
+      <ul class="obj">
+        <li>Building a history <em>before</em> you anchor on a diagnosis</li>
+        <li>Screening for the red flags that separate routine from serious</li>
+        <li>Deciding when a patient belongs in your hands — and when they belong in someone else's</li>
+      </ul>
+      <p class="disclaimer"><strong>Teaching case.</strong> Marian Doyle is fictional and the encounter is simplified for learning. Nothing here is medical advice or a substitute for clinical training, supervision, or your scope-of-practice rules.</p>
+    </div>
+
+    <div class="start-row">
+      <button class="btn" onclick="start()">Meet your patient →</button>
+      <span class="meta">~5 minutes · 5 decisions · choices have consequences</span>
+    </div>
+  </section>
+
+  <!-- ===================== PLAY ===================== -->
+  <section id="play" class="hidden">
+    <div class="eyebrow"><span class="tick"></span>Clinical Reasoning Case&nbsp;·&nbsp;01</div>
+    <div class="stage">
+      <!-- narrative -->
+      <div class="scene">
+        <div id="step-tag" class="step-tag"></div>
+        <div id="situation" class="situation"></div>
+        <div id="prompt" class="prompt"></div>
+        <div id="choices" class="choices"></div>
+        <div id="response" class="hidden"></div>
+      </div>
+
+      <!-- patient chart -->
+      <aside class="chart">
+        <div class="panel">
+          <h3>Patient</h3>
+          <div class="pt-id">
+            <div class="pt-avatar">MD</div>
+            <div>
+              <div class="pt-name">Marian Doyle</div>
+              <div class="pt-sub">58 · retired schoolteacher</div>
+            </div>
+          </div>
+          <div class="vitals">
+            <span class="chip">CC: low back pain</span>
+            <span class="chip">Onset: 6 wks</span>
+            <span class="chip">Course: worsening</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="meter-top">
+            <h3 style="margin:0">Clinical reasoning</h3>
+            <span id="meter-val" class="meter-val">0 / 10</span>
+          </div>
+          <div class="meter-track"><div id="meter-fill" class="meter-fill"></div></div>
+        </div>
+
+        <div class="panel">
+          <h3>Findings notebook</h3>
+          <ul id="notebook" class="notebook"></ul>
+          <div id="notebook-empty" class="empty-note">Nothing recorded yet — what you uncover depends on how you ask.</div>
+        </div>
+
+        <div class="panel" id="flags-panel">
+          <h3>Red flags</h3>
+          <div id="flags" class="flags"></div>
+          <div id="flags-empty" class="empty-note">None identified.</div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===================== DEBRIEF ===================== -->
+  <section id="debrief" class="hidden debrief">
+    <div class="eyebrow"><span class="tick"></span>Case Debrief</div>
+    <div class="verdict" style="margin-top:18px">
+      <span id="verdict-badge" class="badge"></span>
+      <h2 id="verdict-title"></h2>
+      <p id="verdict-story" class="story"></p>
+      <div class="score-strip">
+        <div class="score-item"><div id="s-score" class="n"></div><div class="l">Reasoning score</div></div>
+        <div class="score-item"><div id="s-flags" class="n"></div><div class="l">Red flags caught</div></div>
+        <div class="score-item"><div id="s-call" class="n"></div><div class="l">Final call</div></div>
+      </div>
+    </div>
+
+    <div id="recap" class="recap"></div>
+
+    <div class="expert">
+      <h3>What a strong clinician does here</h3>
+      <p>The trap in this case is <em>anchoring</em> — back pain in a 58-year-old reads as mechanical, so it's tempting to skip the history and start treating. The skill on display isn't spotting cancer. It's noticing a <em>cluster</em>: pain that's constant and worsening, doesn't ease with rest, wakes her at night, plus unintentional weight loss and a personal cancer history. No single item is alarming. Together they're a pattern that doesn't fit mechanical pain.</p>
+      <p>The right move costs almost nothing: ask a few more questions, then send her to her physician with a clear note about what you found. Whether you're a PT, PTA, or massage therapist, the screen-and-refer decision is the same — recognizing who needs a medical workup is core to every license, and referring early is what changes outcomes.</p>
+    </div>
+
+    <div class="maker">
+      <h3>Kendal — this is a template, not a one-off</h3>
+      <p>Everything you just played runs off one <code>CASE</code> object in the file: the patient, every question, the feedback, the findings that unlock, the red flags, and the endings. To build a new case — shoulder, neuro screen, an ethics scenario, anything — you swap the content in that object and the engine does the rest. No Twine, no rebuilding the machinery. That's the part I'll show you how to drive yourself.</p>
+    </div>
+
+    <div class="start-row" style="justify-content:center">
+      <button class="btn" onclick="start()">Run it again →</button>
+      <button class="btn ghost" onclick="toIntro()">Back to start</button>
+    </div>
+  </section>
+
+  <div class="footer">A reusable clinical-reasoning engine · built for Kendal</div>
+</div>
+
+<script>
+/* =====================================================================
+   CASE DATA  — this is the whole "content layer".
+   Swap this object to build an entirely different case; the engine below
+   never changes. Each node = one decision. Each choice can:
+     quality : 'good' | 'ok' | 'poor'   -> reasoning points (2/1/0)
+     response: what the patient/scene does next (keeps it feeling live)
+     note    : the coaching shown after the choice
+     reveals : findings added to the notebook
+     flags   : red flags stamped onto the chart
+     next    : id of the next node
+     outcome : if present, the case ends and routes to the debrief
+   ===================================================================== */
+const CASE = {
+  start: "open",
+  nodes: {
+    open: {
+      tag: "Step 1 · First contact",
+      situation: "Marian eases into the chair, one hand on her lower back. <em>“It started as a niggle about six weeks ago. I figured I tweaked it gardening. But it's just… not letting up. If anything it's worse.”</em>",
+      prompt: "How do you begin?",
+      lesson: "Lead with a thorough history. Hands-on assessment before you understand the story invites anchoring — and this is a case where the story is everything.",
+      choices: [
+        { label: "Take a thorough subjective history before assessing or touching anything.",
+          quality:"good",
+          response:"She nods and settles in. “Sure. Ask away.” You've bought yourself the most valuable thing in the room: her story, before you've decided what it means.",
+          note:"This is the move. A history-first approach keeps your hypotheses open and is the only way the important details in this case ever surface.",
+          next:"history" },
+        { label: "Get her on the table and palpate the lumbar spine to find the painful segment.",
+          quality:"poor",
+          response:"You find some paraspinal tenderness — which tells you almost nothing you didn't already know, and you've started building a story around 'tissue' before hearing hers.",
+          note:"Jumping to hands-on assessment is anchoring. The tender spot feels like progress but quietly commits you to a mechanical explanation. Reset and take the history.",
+          next:"history" },
+        { label: "Reassure her it's almost certainly a strain and start treatment to save her time.",
+          quality:"poor",
+          response:"She looks relieved for a moment. But you've closed the case before opening it.",
+          note:"Premature closure — the single costliest error in this scenario. 'Probably a strain' is usually right, which is exactly why it's dangerous: it trains you to stop looking.",
+          next:"history" }
+      ]
+    },
+
+    history: {
+      tag: "Step 2 · Subjective history",
+      situation: "You've got her talking. The question is what you steer toward.",
+      prompt: "Where do you focus the history?",
+      lesson: "Ask how the pain behaves over a full 24 hours and whether anything eases it. Pattern — not location or a 0–10 number — is what flags non-mechanical pain.",
+      choices: [
+        { label: "Pain behaviour over 24 hours — what eases it, what aggravates it, how it's changed.",
+          quality:"good",
+          response:"“Mornings, evenings, doesn't matter much. Lying down used to help… now it wakes me around 2am most nights. Nothing really shifts it.” You write that down. Mechanical pain rarely behaves like this.",
+          note:"Exactly the right thread to pull. Constant, progressive pain that doesn't ease with rest or position — and night pain — are the features that should raise an eyebrow.",
+          reveals:["Constant, progressive over 6 weeks","Night pain (wakes ~2am); rest & position don't relieve it"],
+          next:"screen" },
+        { label: "Pin down the location and get a 0–10 pain rating.",
+          quality:"ok",
+          response:"“Deep, right across the low back. About a 7.” Tidy for your notes — but a number doesn't tell you how the pain behaves, and behaviour is where this case lives.",
+          note:"Not wrong, just thin. Intensity scores anchor documentation but rarely change your reasoning. You've missed the chance to hear the 24-hour pattern.",
+          reveals:["Deep central lumbar pain, ~7/10"],
+          next:"screen" },
+        { label: "Focus on what makes it better, so you can plan today's treatment.",
+          quality:"poor",
+          response:"“That's the thing — nothing really helps.” You note it as a treatment-planning problem, not as the warning sign it might be.",
+          note:"Framing the history around treatment assumes you've already decided to treat. 'Nothing helps' is a clue you've half-heard while looking the other way.",
+          reveals:["Reports nothing reliably relieves it"],
+          next:"screen" }
+      ]
+    },
+
+    screen: {
+      tag: "Step 3 · Screening",
+      situation: "The pain has dragged on for six weeks and is getting worse, not better.",
+      prompt: "Do you screen for non-musculoskeletal causes — and how widely?",
+      lesson: "Run a full red-flag screen. The whole point of screening is to catch the dangerous minority that doesn't announce itself; a narrow screen can pass while missing the real pattern.",
+      choices: [
+        { label: "Full red-flag screen: weight change, night pain, bowel/bladder, fever, cancer history, response to rest.",
+          quality:"good",
+          response:"“Now that you mention it — I've dropped about twelve pounds since spring without trying. And… I had breast cancer, treated about nine years ago. They told me I was clear.” The room feels different now.",
+          note:"This is the screen that earns its keep. Individually, none of these is proof of anything. As a cluster, in a woman over 50 with a cancer history, they demand a medical workup — not more treatment from you.",
+          reveals:["Unintentional weight loss (~12 lb / 3 mo)","Personal history of breast cancer (~9 yrs ago)"],
+          flags:[
+            {mark:"⚑", text:"Unexplained weight loss + night pain + cancer history — oncologic screening cluster"},
+            {mark:"⚑", text:"Non-mechanical pattern: constant, progressive, unrelieved by rest"}
+          ],
+          next:"synthesis" },
+        { label: "Targeted cauda-equina screen only: saddle numbness and bowel/bladder changes.",
+          quality:"ok",
+          response:"“No, nothing like that — everything's working normally down there.” Reassuring for the emergency you were checking. But it's not the emergency she has.",
+          note:"A fine instinct, half-finished. You ruled out the most acute red flag and stopped — leaving the slower, quieter oncologic cluster completely unscreened.",
+          next:"synthesis" },
+        { label: "Skip screening — the picture looks mechanical enough.",
+          quality:"poor",
+          response:"You move on. The most important questions in this encounter go unasked.",
+          note:"This is where the case is won or lost. Screening exists precisely for presentations that 'look mechanical.' Skip it and you're relying on luck.",
+          next:"synthesis" }
+      ]
+    },
+
+    synthesis: {
+      tag: "Step 4 · Working impression",
+      situation: "Time to commit to a line of thinking.",
+      prompt: "Pull it together — what's your working impression?",
+      lesson: "Name the cluster. Even without a diagnosis, 'this pattern doesn't fit mechanical pain' is the impression that drives the right next step.",
+      choices: [
+        { label: "A cluster of red flags points to possible non-mechanical / serious pathology.",
+          quality:"good",
+          response:"You're not diagnosing — you're recognizing that this doesn't fit, and that recognition is enough to act on.",
+          note:"Correct framing. You don't need to know what it is. You need to know it isn't ordinary, and that it's above your pay grade to manage alone.",
+          next:"disposition" },
+        { label: "Mechanical low back pain — most likely a strain or degenerative change.",
+          quality:"poor",
+          response:"It's the statistically common answer. It's also the one that ignores everything unusual you did or didn't uncover.",
+          note:"Base rates matter, but they don't excuse pattern-blindness. If you landed here, it's usually because the screening earlier was thin.",
+          next:"disposition" },
+        { label: "Not enough to say yet — I'd want to screen further before committing.",
+          quality:"ok",
+          response:"Honest, and safer than forcing a label. The risk is that 'I'll decide later' becomes a reason to treat now and revisit never.",
+          note:"Diagnostic humility is healthy. Just make sure it leads to action — appropriate caution should push you toward referral, not toward a holding pattern.",
+          next:"disposition" }
+      ]
+    },
+
+    disposition: {
+      tag: "Step 5 · Disposition",
+      situation: "Marian is watching your face. <em>“So… can you fix it?”</em>",
+      prompt: "What do you do for her today?",
+      lesson: "Refer her to her physician for a medical workup and communicate the red-flag cluster clearly. Hold treatment aimed at the spine until serious causes are ruled out.",
+      choices: [
+        { label: "Refer to her physician for a medical workup; communicate the red-flag cluster. Hold off on spine-directed treatment.",
+          quality:"good", outcome:"good",
+          response:"You explain plainly: a few things together are worth a doctor's look before anyone treats the back. She's a little rattled but grateful you took it seriously." },
+        { label: "Begin conservative soft-tissue care now and reassess in two weeks.",
+          quality:"poor", outcome:"missed",
+          response:"She relaxes under your hands and leaves feeling cared for. The two-week plan, though, is two weeks the real problem keeps moving." },
+        { label: "Reassure her it's mechanical, give a home exercise program, and discharge.",
+          quality:"poor", outcome:"discharge",
+          response:"She thanks you and heads home with a sheet of exercises — and a problem neither of you has named." },
+        { label: "Treat her symptoms today, but also refer her on.",
+          quality:"ok", outcome:"partial",
+          response:"You get the referral right, which is what matters most. Treating the spine the same day — before anyone's ruled out why it hurts — is the part worth second-guessing." }
+      ]
+    }
+  }
+};
+
+/* OUTCOME NARRATIVES for the debrief */
+const OUTCOMES = {
+  good: { badge:"good", call:"Referred",
+    title:"You made the call that matters.",
+    story:"Her physician orders imaging and labs. The workup finds a lesion in the lumbar spine consistent with recurrent disease — caught early because you didn't treat around it. You never diagnosed cancer. You recognized a pattern that didn't fit and put it in the right hands fast. That is the entire skill." },
+  partial:{ badge:"partial", call:"Referred",
+    title:"Right destination, scenic route.",
+    story:"You referred her on — the decision that changes her outcome — so the important thing went right. Treating the spine the same day was a gamble: if the cause had been fragile (a bone weakened by disease, say), hands-on work before a workup could have done harm. Refer first, treat once it's cleared." },
+  missed:{ badge:"miss", call:"Treated",
+    title:"Comfortable today, costly later.",
+    story:"Two weeks of soft-tissue care brings no lasting relief, and she comes back worse. Eventually she's referred and worked up — later than she could have been. The treatment wasn't wrong because it hurt her hands-on; it was wrong because it delayed the question only a physician could answer." },
+  discharge:{ badge:"miss", call:"Discharged",
+    title:"The exercises weren't the problem.",
+    story:"A home program is reasonable care for mechanical back pain. This wasn't mechanical back pain. Discharging her closed the only door that mattered — the one to a timely medical workup — and she loses weeks before the pattern is taken seriously." }
+};
+
+/* ===================== ENGINE (content-agnostic) ===================== */
+const POINTS = { good:2, ok:1, poor:0 };
+let state;
+
+const $ = id => document.getElementById(id);
+
+function toIntro(){ show("intro"); window.scrollTo({top:0,behavior:"instant"}); }
+
+function start(){
+  state = { id:CASE.start, score:0, steps:0, findings:[], flags:[], path:[] };
+  $("notebook").innerHTML = "";
+  $("flags").innerHTML = "";
+  $("notebook-empty").classList.remove("hidden");
+  $("flags-empty").classList.remove("hidden");
+  updateMeter();
+  show("play");
+  renderNode();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+
+function show(which){
+  ["intro","play","debrief"].forEach(s => $(s).classList.toggle("hidden", s!==which));
+}
+
+function renderNode(){
+  const node = CASE.nodes[state.id];
+  $("step-tag").textContent = node.tag;
+  $("situation").innerHTML = node.situation || "";
+  $("prompt").textContent = node.prompt;
+  $("response").classList.add("hidden");
+  $("response").innerHTML = "";
+  const box = $("choices");
+  box.classList.remove("hidden");
+  box.innerHTML = "";
+  node.choices.forEach((c,i) => {
+    const b = document.createElement("button");
+    b.className = "choice";
+    b.textContent = c.label;
+    b.onclick = () => choose(node, c);
+    box.appendChild(b);
+  });
+}
+
+function choose(node, choice){
+  // score
+  state.score += POINTS[choice.quality];
+  state.steps += 1;
+  // record for recap
+  state.path.push({ q:node.prompt, label:choice.label, quality:choice.quality, lesson:node.lesson });
+  // reveals + flags
+  (choice.reveals||[]).forEach(addFinding);
+  (choice.flags||[]).forEach(addFlag);
+  updateMeter();
+
+  // show response + coaching
+  $("choices").classList.add("hidden");
+  const r = $("response");
+  r.className = "resp";
+  r.classList.remove("hidden");
+  const ending = !!choice.outcome;
+  r.innerHTML = `
+    <div class="patient">${choice.response}</div>
+    <div class="coach ${choice.quality}">
+      <span class="k">${choice.quality==='good'?'Strong reasoning':choice.quality==='ok'?'Partial credit':'Watch out'}</span>
+      ${choice.note}
+    </div>
+    <div class="continue-row">
+      <button class="btn" id="cont">${ending ? 'See how it played out →' : 'Continue →'}</button>
+    </div>`;
+  $("cont").onclick = () => {
+    if(ending){ state.outcome = choice.outcome; toDebrief(); }
+    else { state.id = choice.next; renderNode();
+           document.querySelector('.scene').scrollIntoView({behavior:'smooth',block:'start'}); }
+  };
+}
+
+function addFinding(text){
+  if(state.findings.includes(text)) return;
+  state.findings.push(text);
+  $("notebook-empty").classList.add("hidden");
+  const li = document.createElement("li");
+  li.textContent = text;
+  $("notebook").appendChild(li);
+}
+function addFlag(f){
+  if(state.flags.some(x=>x.text===f.text)) return;
+  state.flags.push(f);
+  $("flags-empty").classList.add("hidden");
+  const d = document.createElement("div");
+  d.className = "flag";
+  d.innerHTML = `<span class="mark">${f.mark}</span><span>${f.text}</span>`;
+  $("flags").appendChild(d);
+}
+function updateMeter(){
+  const pct = Math.round((state.score/10)*100);
+  $("meter-fill").style.width = pct + "%";
+  $("meter-val").textContent = state.score + " / 10";
+}
+
+function toDebrief(){
+  const o = OUTCOMES[state.outcome];
+  $("verdict-badge").className = "badge " + o.badge;
+  $("verdict-badge").textContent = o.badge==="good" ? "Sound call" : o.badge==="partial" ? "Close" : "Missed it";
+  $("verdict-title").textContent = o.title;
+  $("verdict-story").textContent = o.story;
+  $("s-score").textContent = state.score + "/10";
+  $("s-flags").textContent = state.flags.length + "/2";
+  $("s-call").textContent = o.call;
+
+  // recap
+  const recap = $("recap");
+  recap.innerHTML = "";
+  state.path.forEach(step => {
+    const row = document.createElement("div");
+    row.className = "recap-row";
+    const showLesson = step.quality !== "good";
+    row.innerHTML = `
+      <div class="q">${step.q}</div>
+      <div class="you"><span class="dot ${step.quality}"></span><span>${step.label}</span></div>
+      ${showLesson ? `<div class="lesson">${step.lesson}</div>` : ``}`;
+    recap.appendChild(row);
+  });
+
+  show("debrief");
+  window.scrollTo({top:0,behavior:"instant"});
+}
+</script>
+</body>
+</html>
