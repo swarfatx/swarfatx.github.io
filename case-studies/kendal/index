@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinical Reasoning Cases · Swarf ATX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F7F4;--ink:#1C2A2F;--muted:#6E7B74;--line:#E2E6DF;--surface:#FFFFFF;
+    --teal:#2F6F6A;--teal-soft:#E8F0EC;--teal-deep:#234F4B;
+    --shadow:0 1px 2px rgba(28,42,47,.04), 0 8px 30px rgba(28,42,47,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;
+    line-height:1.55;-webkit-font-smoothing:antialiased;padding:clamp(18px,5vw,64px)}
+  .wrap{max-width:900px;margin:0 auto}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--teal);display:flex;align-items:center;gap:10px}
+  .eyebrow .tick{width:22px;height:1px;background:var(--teal)}
+  h1{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(30px,6vw,50px);line-height:1.04;
+    letter-spacing:-.01em;margin:14px 0 0}
+  .lede{color:var(--muted);font-size:clamp(15px,2.4vw,18px);max-width:56ch;margin-top:16px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;margin-top:36px}
+  .card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);
+    border-radius:16px;padding:24px;box-shadow:var(--shadow);text-decoration:none;color:inherit;
+    transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+  .card:hover{transform:translateY(-3px);border-color:var(--teal);
+    box-shadow:0 2px 4px rgba(28,42,47,.05),0 14px 40px rgba(28,42,47,.10)}
+  .card .tag{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+  .card h2{font-family:"Fraunces",serif;font-weight:500;font-size:22px;line-height:1.12;letter-spacing:-.005em}
+  .card p{font-size:14px;color:var(--muted);margin-top:10px;flex:1}
+  .card .foot{display:flex;justify-content:space-between;align-items:center;margin-top:20px;
+    padding-top:16px;border-top:1px solid var(--line)}
+  .card .meta{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+  .card .go{font-family:"IBM Plex Sans",sans-serif;font-weight:600;font-size:13px;color:var(--teal-deep)}
+  .card.soon{opacity:.6;pointer-events:none}
+  .card.soon .go{color:var(--muted)}
+  .footer{margin-top:44px;text-align:center;font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+    letter-spacing:.1em;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow"><span class="tick"></span>Swarf ATX</div>
+  <h1>Clinical Reasoning Cases</h1>
+  <p class="lede">Interactive, decision-by-decision cases for PTA, DPT, and massage-therapy students. Each one puts you in the room with a patient and lets your reasoning — careful or rushed — change how it ends.</p>
+
+  <div class="grid">
+
+    <!-- ============================================================
+         ▼ ADD A CASE: copy one <a class="card">…</a> block, change the
+           href to the new case's folder, and edit the text. That's it.
+         ============================================================ -->
+
+    <a class="card" href="./low-back/">
+      <div class="tag">Musculoskeletal · Screening</div>
+      <h2>The Ache That Wouldn't Quit</h2>
+      <p>Six weeks of low back pain. Most cases like it are harmless — a few are not. Practise screening for the red flags that decide whether a patient stays in your hands.</p>
+      <div class="foot"><span class="meta">5 decisions · ~5 min</span><span class="go">Open case →</span></div>
+    </a>
+
+    <a class="card" href="./calf-dvt/">
+      <div class="tag">Vascular · Contraindication</div>
+      <h2>The Calf That Wasn't a Strain</h2>
+      <p>A “tight calf” after a long flight looks like the easiest appointment of the day. Learn to spot the one presentation where hands-on treatment is the dangerous move.</p>
+      <div class="foot"><span class="meta">5 decisions · ~5 min</span><span class="go">Open case →</span></div>
+    </a>
+
+    <!-- Example of a placeholder card for one you haven't published yet:
+    <a class="card soon" href="#">
+      <div class="tag">Neurological · Screening</div>
+      <h2>Case title</h2>
+      <p>One-line description.</p>
+      <div class="foot"><span class="meta">Coming soon</span><span class="go">—</span></div>
+    </a>
+    -->
+
+  </div>
+
+  <div class="footer">Swarf ATX · we build it, you run it</div>
+</div>
+</body>
+</html>
