@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinical Reasoning Case</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F7F4;--ink:#1C2A2F;--muted:#6E7B74;--line:#E2E6DF;--surface:#FFFFFF;
+    --teal:#2F6F6A;--teal-soft:#E8F0EC;--teal-deep:#234F4B;--alert:#C2542E;--alert-soft:#F7E9E1;
+    --shadow:0 1px 2px rgba(28,42,47,.04), 0 8px 30px rgba(28,42,47,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;
+    line-height:1.55;-webkit-font-smoothing:antialiased;padding:clamp(16px,4vw,48px)}
+  .wrap{max-width:1080px;margin:0 auto}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--teal);display:flex;align-items:center;gap:10px}
+  .eyebrow .tick{width:22px;height:1px;background:var(--teal);display:inline-block}
+  h1{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(30px,5.4vw,52px);
+    line-height:1.04;letter-spacing:-.01em;margin:14px 0 0}
+  .lede{color:var(--muted);font-size:clamp(15px,2.2vw,18px);max-width:60ch;margin-top:16px}
+  .intro-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;
+    padding:clamp(22px,4vw,40px);box-shadow:var(--shadow);margin-top:30px}
+  .obj-label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .obj{list-style:none;display:grid;gap:12px}
+  .obj li{display:flex;gap:12px;align-items:flex-start;font-size:15px}
+  .obj li::before{content:"";flex:0 0 auto;width:8px;height:8px;border-radius:50%;
+    background:var(--teal);margin-top:8px}
+  .disclaimer{margin-top:24px;font-size:12.5px;color:var(--muted);
+    border-top:1px solid var(--line);padding-top:16px;line-height:1.5}
+  .btn{font-family:"IBM Plex Sans",sans-serif;font-weight:600;font-size:15px;border:none;
+    border-radius:11px;padding:14px 24px;cursor:pointer;background:var(--teal);color:#fff;
+    transition:transform .15s ease,background .2s ease;display:inline-flex;align-items:center;gap:10px}
+  .btn:hover{background:var(--teal-deep)}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:transparent;color:var(--teal);border:1px solid var(--line)}
+  .btn.ghost:hover{background:var(--teal-soft)}
+  .btn:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+  .start-row{margin-top:30px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .start-row .meta{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted)}
+  .stage{display:grid;grid-template-columns:1fr 320px;gap:26px;margin-top:28px;align-items:start}
+  @media(max-width:820px){.stage{grid-template-columns:1fr}}
+  .scene{background:var(--surface);border:1px solid var(--line);border-radius:18px;
+    padding:clamp(20px,3.4vw,34px);box-shadow:var(--shadow);min-height:300px}
+  .step-tag{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted)}
+  .situation{font-size:16.5px;margin-top:14px;line-height:1.6}
+  .situation em{color:var(--teal-deep);font-style:italic}
+  .prompt{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(20px,3vw,26px);
+    line-height:1.2;margin-top:22px;letter-spacing:-.005em}
+  .choices{display:grid;gap:12px;margin-top:22px}
+  .choice{text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:12px;
+    padding:16px 18px;font-size:15px;font-family:inherit;color:var(--ink);cursor:pointer;
+    transition:border-color .18s ease,background .18s ease,transform .12s ease;line-height:1.45}
+  .choice:hover{border-color:var(--teal);background:#fff}
+  .choice:active{transform:translateY(1px)}
+  .choice:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+  .resp{animation:rise .4s ease both}
+  .resp .patient{font-size:15.5px;line-height:1.6;color:var(--ink)}
+  .resp .patient::before{content:"AT THE BEDSIDE";display:block;font-family:"IBM Plex Mono",monospace;
+    font-size:10.5px;letter-spacing:.16em;color:var(--muted);margin-bottom:8px}
+  .coach{margin-top:18px;border-radius:12px;padding:16px 18px;font-size:14.5px;line-height:1.55}
+  .coach .k{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;display:block;margin-bottom:7px}
+  .coach.good{background:var(--teal-soft)} .coach.good .k{color:var(--teal-deep)}
+  .coach.ok{background:#EEF1EC} .coach.ok .k{color:var(--muted)}
+  .coach.poor{background:var(--alert-soft)} .coach.poor .k{color:var(--alert)}
+  .continue-row{margin-top:22px}
+  .chart{position:sticky;top:24px;display:grid;gap:16px}
+  @media(max-width:820px){.chart{position:static}}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;
+    padding:18px 18px 20px;box-shadow:var(--shadow)}
+  .panel h3{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .pt-id{display:flex;gap:14px;align-items:center}
+  .pt-avatar{flex:0 0 auto;width:46px;height:46px;border-radius:50%;background:var(--teal-soft);
+    color:var(--teal-deep);display:grid;place-items:center;font-family:"Fraunces",serif;font-size:19px;font-weight:600}
+  .pt-name{font-family:"Fraunces",serif;font-size:19px;font-weight:500;line-height:1.1}
+  .pt-sub{font-size:13px;color:var(--muted);margin-top:2px}
+  .vitals{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+  .chip{font-family:"IBM Plex Mono",monospace;font-size:11px;background:var(--paper);
+    border:1px solid var(--line);border-radius:999px;padding:5px 10px;color:var(--ink)}
+  .meter-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+  .meter-val{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--teal-deep)}
+  .meter-track{height:8px;background:var(--paper);border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .meter-fill{height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--teal-deep));
+    border-radius:999px;transition:width .6s cubic-bezier(.2,.7,.2,1)}
+  .notebook{list-style:none;display:grid;gap:9px;min-height:8px}
+  .notebook li{font-size:13.5px;line-height:1.4;display:flex;gap:9px;align-items:flex-start;animation:rise .45s ease both}
+  .notebook li::before{content:"";flex:0 0 auto;width:6px;height:6px;border-radius:2px;background:var(--teal);margin-top:7px}
+  .empty-note{font-size:13px;color:var(--muted);font-style:italic}
+  .flags{display:grid;gap:9px;min-height:8px}
+  .flag{display:flex;gap:10px;align-items:flex-start;background:var(--alert-soft);border:1px solid #EAC9B8;
+    border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.4;animation:stamp .5s cubic-bezier(.2,1.3,.3,1) both}
+  .flag .mark{flex:0 0 auto;color:var(--alert);font-weight:600}
+  .debrief .verdict{background:var(--surface);border:1px solid var(--line);border-radius:18px;
+    padding:clamp(22px,4vw,38px);box-shadow:var(--shadow)}
+  .verdict .badge{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;padding:6px 12px;border-radius:999px;display:inline-block}
+  .badge.good{background:var(--teal-soft);color:var(--teal-deep)}
+  .badge.partial{background:#EEF1EC;color:var(--muted)}
+  .badge.miss{background:var(--alert-soft);color:var(--alert)}
+  .verdict h2{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(24px,4vw,34px);
+    line-height:1.12;margin:16px 0 0;letter-spacing:-.01em}
+  .verdict p{margin-top:14px;font-size:16px;line-height:1.6;max-width:64ch}
+  .score-strip{display:flex;gap:26px;flex-wrap:wrap;margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+  .score-item .n{font-family:"Fraunces",serif;font-size:30px;font-weight:500;line-height:1}
+  .score-item .l{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);margin-top:6px}
+  .recap{margin-top:24px;display:grid;gap:12px}
+  .recap-row{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:16px 18px}
+  .recap-row .q{font-size:13px;color:var(--muted);margin-bottom:6px}
+  .recap-row .you{font-size:15px;display:flex;gap:9px;align-items:flex-start}
+  .recap-row .dot{flex:0 0 auto;width:9px;height:9px;border-radius:50%;margin-top:7px}
+  .dot.good{background:var(--teal)} .dot.ok{background:#B6BEB6} .dot.poor{background:var(--alert)}
+  .recap-row .lesson{font-size:13.5px;color:var(--teal-deep);margin-top:8px;padding-left:18px;
+    border-left:2px solid var(--teal-soft);line-height:1.5}
+  .expert{background:var(--teal-deep);color:#EAF1EE;border-radius:18px;padding:clamp(22px,4vw,34px);margin-top:24px}
+  .expert h3{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:#9DC3BC;margin-bottom:14px}
+  .expert p{font-size:15.5px;line-height:1.65;max-width:64ch}
+  .expert p+p{margin-top:12px}
+  .expert em{color:#EAF1EE;font-style:italic;border-bottom:1px solid #4C736E}
+  .footer{margin-top:34px;text-align:center;font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+    letter-spacing:.1em;color:var(--muted)}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes stamp{0%{opacity:0;transform:scale(1.15) rotate(-1.5deg)}60%{opacity:1;transform:scale(.98)}100%{transform:scale(1)}}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  .hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section id="intro">
+    <div class="eyebrow"><span class="tick"></span><span id="i-kicker"></span></div>
+    <h1 id="i-title"></h1>
+    <p class="lede" id="i-lede"></p>
+    <div class="intro-card">
+      <div class="obj-label">In this case you'll practice</div>
+      <ul class="obj" id="i-obj"></ul>
+      <p class="disclaimer" id="i-disc"></p>
+    </div>
+    <div class="start-row">
+      <button class="btn" id="i-start" onclick="start()"></button>
+      <span class="meta" id="i-meta"></span>
+    </div>
+  </section>
+
+  <section id="play" class="hidden">
+    <div class="eyebrow"><span class="tick"></span><span id="p-kicker"></span></div>
+    <div class="stage">
+      <div class="scene">
+        <div id="step-tag" class="step-tag"></div>
+        <div id="situation" class="situation"></div>
+        <div id="prompt" class="prompt"></div>
+        <div id="choices" class="choices"></div>
+        <div id="response" class="hidden"></div>
+      </div>
+      <aside class="chart">
+        <div class="panel">
+          <h3>Patient</h3>
+          <div class="pt-id">
+            <div class="pt-avatar" id="pt-avatar"></div>
+            <div><div class="pt-name" id="pt-name"></div><div class="pt-sub" id="pt-sub"></div></div>
+          </div>
+          <div class="vitals" id="pt-chips"></div>
+        </div>
+        <div class="panel">
+          <div class="meter-top"><h3 style="margin:0">Clinical reasoning</h3><span id="meter-val" class="meter-val"></span></div>
+          <div class="meter-track"><div id="meter-fill" class="meter-fill"></div></div>
+        </div>
+        <div class="panel">
+          <h3>Findings notebook</h3>
+          <ul id="notebook" class="notebook"></ul>
+          <div id="notebook-empty" class="empty-note">Nothing recorded yet — what you uncover depends on how you ask.</div>
+        </div>
+        <div class="panel" id="flags-panel">
+          <h3>Red flags</h3>
+          <div id="flags" class="flags"></div>
+          <div id="flags-empty" class="empty-note">None identified.</div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="debrief" class="hidden debrief">
+    <div class="eyebrow"><span class="tick"></span>Case Debrief</div>
+    <div class="verdict" style="margin-top:18px">
+      <span id="v-badge" class="badge"></span>
+      <h2 id="v-title"></h2>
+      <p id="v-story"></p>
+      <div class="score-strip">
+        <div class="score-item"><div id="s-score" class="n"></div><div class="l">Reasoning score</div></div>
+        <div class="score-item" id="s-flags-item"><div id="s-flags" class="n"></div><div class="l">Red flags caught</div></div>
+        <div class="score-item"><div id="s-call" class="n"></div><div class="l">Final call</div></div>
+      </div>
+    </div>
+    <div id="recap" class="recap"></div>
+    <div class="expert">
+      <h3 id="e-head"></h3>
+      <div id="e-body"></div>
+    </div>
+    <div class="start-row" style="justify-content:center">
+      <button class="btn" onclick="start()">Run it again →</button>
+      <button class="btn ghost" onclick="toIntro()">Back to start</button>
+    </div>
+  </section>
+
+  <div class="footer" id="foot"></div>
+</div>
+
+<script>
+/* =====================================================================
+   ▼▼▼  CASE START — this is the ONLY part you replace to make a new case.
+        Everything below the CASE END marker is the engine; leave it alone.
+   ===================================================================== */
+const CASE = {
+  meta: {
+    number: "02",
+    kicker: "Clinical Reasoning Case",
+    title: "The Calf That Wasn't a Strain",
+    lede: "A fit 46-year-old books in for a “tight calf” after a long trip. It looks like the easiest appointment of your day. The most dangerous thing you can do is treat it like one.",
+    duration: "~5 minutes · 5 decisions · choices have consequences",
+    startLabel: "Meet your patient →",
+    objectives: [
+      "Telling a muscle strain apart from a vascular emergency",
+      "Screening for the risk factors that turn a sore calf into a red flag",
+      "Recognising when hands-on treatment is exactly the wrong move"
+    ],
+    disclaimer: "<strong>Teaching case.</strong> Dan Rivera is fictional and the encounter is simplified for learning. Nothing here is medical advice or a substitute for clinical training, supervision, or your scope-of-practice rules.",
+    footer: "A reusable clinical-reasoning engine · Swarf ATX"
+  },
+
+  patient: {
+    initials: "DR",
+    name: "Dan Rivera",
+    subtitle: "46 · software consultant",
+    chips: ["CC: left calf pain", "Onset: 3 days", "Thinks it's a strain"]
+  },
+
+  start: "open",
+  nodes: {
+    open: {
+      tag: "Step 1 · First contact",
+      situation: "Dan rolls up his trouser leg and points to the back of his lower leg. <em>“Left calf's been killing me about three days. Reckon I strained it — did a big walking tour last week. Can you work it out for me?”</em>",
+      prompt: "How do you begin?",
+      lesson: "Take a history before you lay a hand on it. A calf that 'looks like a strain' is exactly the presentation where a quick screen matters most.",
+      choices: [
+        { label: "Take a history first — how it started, what's changed, and any recent travel or illness.",
+          quality:"good",
+          response:"“Sure.” He's expecting you to just dig into the muscle, but you want the story before your hands get involved.",
+          note:"Right instinct. The calf is the one region where the harmless diagnosis and a medical emergency look almost identical on the surface — the history is how you tell them apart.",
+          next:"history" },
+        { label: "Start with soft-tissue work on the calf to release the tightness.",
+          quality:"poor",
+          response:"You reach for the spot he's pointing at. It's the intuitive move — and in this region, the intuitive move is the one that can do harm.",
+          note:"Hands-on before screening is the exact error this case is built around. If this were a clot, deep calf work could dislodge it. Always screen the calf before you treat it.",
+          next:"history" },
+        { label: "Agree it's a classic strain from the walking tour and plan a treatment series.",
+          quality:"poor",
+          response:"He nods, reassured. You've named it before you've checked it.",
+          note:"Anchoring on the story he handed you. 'Strain from a walking tour' is plausible — which is precisely what makes skipping the screen so tempting, and so risky.",
+          next:"history" }
+      ]
+    },
+    history: {
+      tag: "Step 2 · Subjective history",
+      situation: "He's happy to talk while you take a look.",
+      prompt: "What do you steer the history toward?",
+      lesson: "Ask about onset, one leg or both, and any recent immobility, surgery, or travel. Those are the factors that separate a strain from a clot.",
+      choices: [
+        { label: "Onset, one leg or both, and recent immobility — flights, surgery, illness.",
+          quality:"good",
+          response:"“Now you mention it — flew back from Tokyo four days ago. Eleven hours, barely moved. And yeah, it's just the left leg.”",
+          note:"That's the thread that matters. Prolonged immobility plus one-sided symptoms is the classic setup for a deep-vein clot — nothing like a bilateral training ache.",
+          reveals:["Gradual onset over ~3 days, no clear injury","11-hour flight 4 days ago, minimal movement","Left leg only"],
+          next:"screen" },
+        { label: "How bad it is and which movements make it worse.",
+          quality:"ok",
+          response:"“Aches most of the time, worse when I walk on it. Maybe a 5.” Useful for a strain — but it doesn't tell you whether this is a strain at all.",
+          note:"Reasonable for musculoskeletal pain, but it assumes the problem is musculoskeletal. You've skipped the questions that would challenge that assumption.",
+          reveals:["Constant ache ~5/10, worse on weight-bearing"],
+          next:"screen" },
+        { label: "Which stretches he's already tried, so you can build on them.",
+          quality:"poor",
+          response:"“Rolled it, stretched it — nothing's touched it.” You file it as a stubborn strain.",
+          note:"Framing the history around treatment presumes the diagnosis. 'Stretching didn't help' is a clue you've walked straight past.",
+          reveals:["Stretching and foam-rolling haven't helped"],
+          next:"screen" }
+      ]
+    },
+    screen: {
+      tag: "Step 3 · Examination",
+      situation: "You bring both legs side by side to compare.",
+      prompt: "What do you check before deciding anything?",
+      lesson: "Compare the legs for one-sided swelling, warmth, and colour, and weigh the risk history. Those signs plus recent immobility are a hands-off, refer-now picture.",
+      choices: [
+        { label: "Compare both calves for swelling, warmth, and colour; note tenderness alongside the risk history.",
+          quality:"good",
+          response:"The left calf is visibly larger, warm, and tender along the deep line of the muscle. Next to the right leg, the difference is hard to miss once you actually look.",
+          note:"This is the screen that changes everything. One-sided swelling and warmth, on top of recent immobility, is a textbook deep-vein-thrombosis picture — a medical emergency, not a treatment target.",
+          reveals:["Left calf visibly larger than the right","Warm to touch, tender along the deep calf"],
+          flags:[
+            {mark:"⚑", text:"Unilateral calf swelling + warmth with recent immobility — possible DVT"},
+            {mark:"⚑", text:"Deep calf work could dislodge a clot — risk of pulmonary embolism"}
+          ],
+          next:"synthesis" },
+        { label: "Palpate the sore spot and test resisted plantarflexion.",
+          quality:"ok",
+          response:"Tender, a little weak — consistent with a strain. But you never compared it to the other leg or weighed the travel history.",
+          note:"You examined the muscle but not the possibility. Without the side-to-side comparison, the swelling that should have stopped you goes unseen.",
+          next:"synthesis" },
+        { label: "It's clearly a strain — get started on treatment.",
+          quality:"poor",
+          response:"You move to treat. The one look that mattered never happens.",
+          note:"This is where the case is won or lost. In the calf, 'clearly a strain' has to be earned by a screen — because the alternative can be fatal.",
+          next:"synthesis" }
+      ]
+    },
+    synthesis: {
+      tag: "Step 4 · Working impression",
+      situation: "Time to decide what you're actually dealing with.",
+      prompt: "What's your working impression?",
+      lesson: "Name the possibility of a clot. You don't diagnose it — you recognise it isn't something to treat by hand, and act accordingly.",
+      choices: [
+        { label: "This could be a DVT — a possible clot. Not something for hands-on treatment.",
+          quality:"good",
+          response:"You're not diagnosing it. You're recognising a pattern that takes this out of your hands entirely.",
+          note:"Exactly right. The call isn't 'is it definitely a clot' — it's 'this is enough of a possibility that treating it would be reckless.'",
+          next:"disposition" },
+        { label: "Stubborn calf strain — it just needs consistent work.",
+          quality:"poor",
+          response:"The common answer, and the one that ignores the swelling and the flight.",
+          note:"Base rates favour strains, but base rates don't dislodge clots — unscreened assumptions do. If you're here, the exam step was probably thin.",
+          next:"disposition" },
+        { label: "Not sure yet — but enough doubt that I shouldn't treat it.",
+          quality:"ok",
+          response:"Honest, and here honesty points the right way: doubt about a calf like this means hands off until it's cleared.",
+          note:"You don't need certainty. In this region, reasonable doubt is itself the indication to refer rather than treat.",
+          next:"disposition" }
+      ]
+    },
+    disposition: {
+      tag: "Step 5 · Disposition",
+      situation: "Dan is still expecting you to sort his calf out. <em>“So — are we good to get started?”</em>",
+      prompt: "What do you do?",
+      lesson: "Do not perform hands-on treatment. Refer him for urgent same-day medical assessment; if he develops chest pain or breathlessness, that's an emergency.",
+      choices: [
+        { label: "No hands-on treatment. Explain your concern plainly and send him for urgent same-day medical assessment.",
+          quality:"good", outcome:"good",
+          response:"You tell him straight: the swelling plus the long flight means this needs a doctor today, before anyone touches it. He's surprised, but he takes it seriously." },
+        { label: "Give the calf a thorough soft-tissue treatment to settle it down.",
+          quality:"poor", outcome:"missed",
+          response:"You work the calf the way you would any strain. He leaves looser and grateful — unaware that the safest hands today were the ones that didn't press." },
+        { label: "Send him home with stretches and a foam roller; review in a week.",
+          quality:"poor", outcome:"discharge",
+          response:"He heads off with a week-long plan for a problem that doesn't have a week." },
+        { label: "Refer him today — but do some gentle work first, since he came all this way.",
+          quality:"ok", outcome:"partial",
+          response:"You get the referral right, which is what protects him. The 'gentle work first' is the part to rethink." }
+      ]
+    }
+  },
+
+  outcomes: {
+    good: { badge:"good", label:"Sound call", call:"Referred",
+      title:"You knew when not to treat.",
+      story:"An ultrasound that day confirms a deep vein thrombosis, and he's started on blood thinners before it can travel. The skill wasn't diagnosing a clot — it was recognising that a swollen, warm calf after a long flight is a hands-off, refer-now situation. The treatment you didn't give is what kept him safe." },
+    partial: { badge:"partial", label:"Close", call:"Referred",
+      title:"Right call, unnecessary risk.",
+      story:"You referred him — the decision that matters — so the outcome holds. But 'a little gentle work first' isn't a safe compromise with a suspected clot; any hands-on carries the same risk. When you suspect a DVT, the safe amount of touch is none." },
+    missed: { badge:"miss", label:"Missed it", call:"Treated",
+      title:"The dangerous kind of thorough.",
+      story:"Hands-on work on an undiagnosed clot carries a real risk of dislodging it. In this scenario Dan grows breathless on the drive home and ends up in the emergency department with a clot on the lung. The treatment wasn't wrong because it was careless — it was wrong because the calf needed screening, not pressure." },
+    discharge: { badge:"miss", label:"Missed it", call:"Discharged",
+      title:"A week it didn't have.",
+      story:"Stretches are sound advice for a strain. This wasn't a strain. Sending him home delays the one thing that helps — urgent assessment — and gives a possible clot a week to grow or travel." }
+  },
+
+  expert: {
+    heading: "What a strong clinician does here",
+    paragraphs: [
+      "The trap is that a deep-vein clot and a calf strain present almost identically — a sore, tight calf in someone who's been active. What separates them isn't in the muscle; it's in the history and the side-by-side look: <em>one-sided</em> swelling and warmth after a stretch of immobility like a long flight or recent surgery. Skip the screen and the two look the same.",
+      "What makes the calf uniquely high-stakes for manual therapists is that the instinctive treatment — deep soft-tissue work — is the very thing that can dislodge a clot and send it to the lungs. So the skill isn't diagnosing a DVT; it's recognising enough risk to keep your hands off and refer the same day. Across PT, PTA, and massage practice, unexplained one-sided calf swelling is a hands-off, screen-and-refer situation, every time."
+    ]
+  }
+};
+/* =====================================================================
+   ▲▲▲  CASE END — do not edit below this line.
+   ===================================================================== */
+
+/* ---------------------- ENGINE (leave alone) ---------------------- */
+const POINTS = { good:2, ok:1, poor:0 };
+let state, MAX = 0, FLAGS_TOTAL = 0;
+const $ = id => document.getElementById(id);
+
+function computeMax(){
+  const memo = {};
+  function depth(id, seen){
+    if(seen.has(id)) return 0;
+    if(memo[id]!=null) return memo[id];
+    const node = CASE.nodes[id]; if(!node) return 0;
+    const s2 = new Set(seen); s2.add(id);
+    let best = 0;
+    node.choices.forEach(c => { const r = c.next ? depth(c.next, s2) : 0; if(r>best) best=r; });
+    return (memo[id] = 1 + best);
+  }
+  return depth(CASE.start, new Set()) * 2;
+}
+function computeFlagTotal(){
+  const set = new Set();
+  Object.values(CASE.nodes).forEach(n => n.choices.forEach(c => (c.flags||[]).forEach(f => set.add(f.text))));
+  return set.size;
+}
+
+function boot(){
+  const m = CASE.meta, p = CASE.patient;
+  document.title = m.title;
+  const tag = `${m.kicker} · ${m.number}`;
+  $("i-kicker").textContent = tag; $("p-kicker").textContent = tag;
+  $("i-title").textContent = m.title;
+  $("i-lede").innerHTML = m.lede;
+  $("i-disc").innerHTML = m.disclaimer;
+  $("i-start").textContent = m.startLabel || "Begin the case →";
+  $("i-meta").textContent = m.duration || "";
+  $("foot").textContent = m.footer || "";
+  const obj = $("i-obj"); obj.innerHTML = "";
+  (m.objectives||[]).forEach(t => { const li=document.createElement("li"); li.innerHTML=t; obj.appendChild(li); });
+  $("pt-avatar").textContent = p.initials || "";
+  $("pt-name").textContent = p.name || "";
+  $("pt-sub").textContent = p.subtitle || "";
+  const chips = $("pt-chips"); chips.innerHTML = "";
+  (p.chips||[]).forEach(t => { const s=document.createElement("span"); s.className="chip"; s.textContent=t; chips.appendChild(s); });
+
+  MAX = computeMax();
+  FLAGS_TOTAL = computeFlagTotal();
+  if(FLAGS_TOTAL === 0){ $("flags-panel").classList.add("hidden"); $("s-flags-item").classList.add("hidden"); }
+}
+
+function toIntro(){ show("intro"); window.scrollTo({top:0,behavior:"instant"}); }
+function show(which){ ["intro","play","debrief"].forEach(s => $(s).classList.toggle("hidden", s!==which)); }
+
+function start(){
+  state = { id:CASE.start, score:0, steps:0, findings:[], flags:[], path:[] };
+  $("notebook").innerHTML = ""; $("flags").innerHTML = "";
+  $("notebook-empty").classList.remove("hidden"); $("flags-empty").classList.remove("hidden");
+  updateMeter();
+  show("play"); renderNode();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+
+function renderNode(){
+  const node = CASE.nodes[state.id];
+  $("step-tag").textContent = node.tag || "";
+  $("situation").innerHTML = node.situation || "";
+  $("prompt").textContent = node.prompt || "";
+  $("response").classList.add("hidden"); $("response").innerHTML = "";
+  const box = $("choices"); box.classList.remove("hidden"); box.innerHTML = "";
+  node.choices.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "choice"; b.textContent = c.label;
+    b.onclick = () => choose(node, c);
+    box.appendChild(b);
+  });
+}
+
+function choose(node, choice){
+  state.score += POINTS[choice.quality]; state.steps += 1;
+  state.path.push({ q:node.prompt, label:choice.label, quality:choice.quality, lesson:node.lesson });
+  (choice.reveals||[]).forEach(addFinding);
+  (choice.flags||[]).forEach(addFlag);
+  updateMeter();
+  $("choices").classList.add("hidden");
+  const r = $("response"); r.className = "resp"; r.classList.remove("hidden");
+  const ending = !!choice.outcome;
+  const k = choice.quality==='good'?'Strong reasoning':choice.quality==='ok'?'Partial credit':'Watch out';
+  r.innerHTML = `
+    <div class="patient">${choice.response||""}</div>
+    <div class="coach ${choice.quality}"><span class="k">${k}</span>${choice.note||""}</div>
+    <div class="continue-row"><button class="btn" id="cont">${ending?'See how it played out →':'Continue →'}</button></div>`;
+  $("cont").onclick = () => {
+    if(ending){ state.outcome = choice.outcome; toDebrief(); }
+    else { state.id = choice.next; renderNode(); document.querySelector('.scene').scrollIntoView({behavior:'smooth',block:'start'}); }
+  };
+}
+
+function addFinding(t){
+  if(state.findings.includes(t)) return;
+  state.findings.push(t); $("notebook-empty").classList.add("hidden");
+  const li = document.createElement("li"); li.textContent = t; $("notebook").appendChild(li);
+}
+function addFlag(f){
+  if(state.flags.some(x=>x.text===f.text)) return;
+  state.flags.push(f); $("flags-empty").classList.add("hidden");
+  const d = document.createElement("div"); d.className = "flag";
+  d.innerHTML = `<span class="mark">${f.mark||'⚑'}</span><span>${f.text}</span>`; $("flags").appendChild(d);
+}
+function updateMeter(){
+  const pct = MAX>0 ? Math.round((state.score/MAX)*100) : 0;
+  $("meter-fill").style.width = pct + "%";
+  $("meter-val").textContent = state.score + " / " + MAX;
+}
+
+function toDebrief(){
+  const o = CASE.outcomes[state.outcome] || {badge:"partial",label:"Complete",call:"—",title:"",story:""};
+  $("v-badge").className = "badge " + (o.badge||"partial");
+  $("v-badge").textContent = o.label || "Complete";
+  $("v-title").textContent = o.title || "";
+  $("v-story").textContent = o.story || "";
+  $("s-score").textContent = state.score + "/" + MAX;
+  $("s-flags").textContent = state.flags.length + "/" + FLAGS_TOTAL;
+  $("s-call").textContent = o.call || "—";
+  const recap = $("recap"); recap.innerHTML = "";
+  state.path.forEach(step => {
+    const row = document.createElement("div"); row.className = "recap-row";
+    const showLesson = step.quality !== "good" && step.lesson;
+    row.innerHTML = `<div class="q">${step.q}</div>
+      <div class="you"><span class="dot ${step.quality}"></span><span>${step.label}</span></div>
+      ${showLesson ? `<div class="lesson">${step.lesson}</div>` : ``}`;
+    recap.appendChild(row);
+  });
+  $("e-head").textContent = CASE.expert?.heading || "";
+  const body = $("e-body"); body.innerHTML = "";
+  (CASE.expert?.paragraphs||[]).forEach(t => { const p=document.createElement("p"); p.innerHTML=t; body.appendChild(p); });
+  show("debrief"); window.scrollTo({top:0,behavior:"instant"});
+}
+
+boot();
+</script>
+</body>
+</html>
